@@ -1,4 +1,4 @@
-package mrutil
+package goutils
 
 import "reflect"
 

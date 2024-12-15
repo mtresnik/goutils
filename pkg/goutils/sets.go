@@ -1,4 +1,4 @@
-package mrutil
+package goutils
 
 // SetContains O(1)
 func SetContains[M ~map[K]bool, K comparable](m M, key K) bool {

@@ -1,4 +1,4 @@
-package mrutil
+package goutils
 
 func MinMaxInt(one int, two int) (minValue int, maxValue int) {
 	if one < two {
