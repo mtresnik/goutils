@@ -15,20 +15,6 @@ func DrawLine(img draw.Image, x0, y0, x1, y1 int, color color.Color, thickness i
 	dx := x1 - x0
 	dy := y1 - y0
 
-	if dx == 0 {
-		minX = minX - thickness/2
-		maxX = maxX + thickness/2
-		height := dy
-		DrawRectangle(img, minX, minY, thickness, height, color)
-		return
-	}
-	if dy == 0 {
-		minY = minY - thickness/2
-		maxY = maxY + thickness/2
-		width := dx
-		DrawRectangle(img, minX, minY, width, thickness, color)
-		return
-	}
 	minX = minX - thickness/2
 	maxX = maxX + thickness/2
 	minY = minY - thickness/2
@@ -40,13 +26,6 @@ func DrawLine(img draw.Image, x0, y0, x1, y1 int, color color.Color, thickness i
 		t := float64(index) / float64(numPoints)
 		FillCircle(img, int(t*float64(dx))+x0, int(t*float64(dy))+y0, thickness/2, color)
 	}
-}
-
-func abs(i int) int {
-	if i < 0 {
-		return -i
-	}
-	return i
 }
 
 func DrawRectangle(img draw.Image, x0, y0, width, height int, color color.Color) {
