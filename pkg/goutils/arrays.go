@@ -7,6 +7,13 @@ import (
 	"strings"
 )
 
+func GetOrDefault[T any](a []T, index int, defaultValue T) T {
+	if index < len(a) {
+		return a[index]
+	}
+	return defaultValue
+}
+
 func ArrayToString(a interface{}) string {
 	t := GetElemType(a)
 	switch t.String() {
