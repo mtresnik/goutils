@@ -3,35 +3,42 @@ package goutils
 import (
 	"image/color"
 	"image/draw"
+	"math"
 )
 
-func DrawLine(img draw.Image, x0, y0, x1, y1 int, color color.Color) {
-	dx := abs(x1 - x0)
-	dy := abs(y1 - y0)
-	sx := 1
-	if x0 > x1 {
-		sx = -1
-	}
-	sy := 1
-	if y0 > y1 {
-		sy = -1
-	}
-	err := dx - dy
+func DrawLine(img draw.Image, x0, y0, x1, y1 int, color color.Color, thickness int) {
+	minX := min(x0, x1)
+	minY := min(y0, y1)
+	maxX := max(x0, x1)
+	maxY := max(y0, y1)
 
-	for {
-		img.Set(x0, y0, color)
-		if x0 == x1 && y0 == y1 {
-			break
-		}
-		e2 := 2 * err
-		if e2 > -dy {
-			err -= dy
-			x0 += sx
-		}
-		if e2 < dx {
-			err += dx
-			y0 += sy
-		}
+	dx := x1 - x0
+	dy := y1 - y0
+
+	if dx == 0 {
+		minX = minX - thickness/2
+		maxX = maxX + thickness/2
+		height := dy
+		DrawRectangle(img, minX, minY, thickness, height, color)
+		return
+	}
+	if dy == 0 {
+		minY = minY - thickness/2
+		maxY = maxY + thickness/2
+		width := dx
+		DrawRectangle(img, minX, minY, width, thickness, color)
+		return
+	}
+	minX = minX - thickness/2
+	maxX = maxX + thickness/2
+	minY = minY - thickness/2
+	maxY = maxY + thickness/2
+
+	numPoints := int(math.Sqrt(float64(dx*dx + dy*dy)))
+
+	for index := 0; index < numPoints; index++ {
+		t := float64(index) / float64(numPoints)
+		FillCircle(img, int(t*float64(dx))+x0, int(t*float64(dy))+y0, thickness/2, color)
 	}
 }
 
