@@ -1,7 +1,10 @@
 package goutils
 
 import (
+	"crypto/sha256"
+	"encoding/binary"
 	"fmt"
+	"math"
 	"reflect"
 	"strconv"
 	"strings"
@@ -113,4 +116,27 @@ func DeepFlatten(root []any) []any {
 		retArray = Flatten(retArray)
 	}
 	return retArray
+}
+
+func HashFloats(values ...float64) int64 {
+	hasher := sha256.New()
+
+	for _, value := range values {
+		bits := math.Float64bits(value)
+		buf := make([]byte, 8)
+		binary.BigEndian.PutUint64(buf, bits)
+		_, _ = hasher.Write(buf)
+	}
+
+	size := len(values)
+	sizeBuf := make([]byte, 8)
+	binary.BigEndian.PutUint64(sizeBuf, uint64(size))
+	_, _ = hasher.Write(sizeBuf)
+
+	fullHash := hasher.Sum(nil)
+	hash1 := binary.BigEndian.Uint64(fullHash[:8])
+	hash2 := binary.BigEndian.Uint64(fullHash[8:16])
+
+	finalHash := int64(hash1 ^ hash2)
+	return finalHash
 }
