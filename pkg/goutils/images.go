@@ -68,10 +68,37 @@ func FillRectangle(img draw.Image, x0, y0, width, height int, color color.Color)
 	}
 }
 
-func HashColor(c color.Color) int64 {
+func FloatsToColors(floats [][]float64) []color.Color {
+	ret := make([]color.Color, len(floats))
+	for i, f := range floats {
+		ret[i] = FloatToColor(f)
+	}
+	return ret
+}
+
+func FloatToColor(point []float64) color.Color {
+	r := uint8(point[0])
+	g := uint8(point[1])
+	b := uint8(point[2])
+	a := uint8(point[3])
+	return color.RGBA{R: r, G: g, B: b, A: a}
+}
+
+func ColorsToFloats(colors []color.Color) [][]float64 {
+	ret := make([][]float64, len(colors))
+	for i, c := range colors {
+		ret[i] = ColorToFloats(c)
+	}
+	return ret
+}
+
+func ColorToFloats(c color.Color) []float64 {
 	r, g, b, a := c.RGBA()
-	values := []float64{float64(r), float64(g), float64(b), float64(a)}
-	return HashFloats(values...)
+	return []float64{float64(r), float64(g), float64(b), float64(a)}
+}
+
+func HashColor(c color.Color) int64 {
+	return HashFloats(ColorToFloats(c)...)
 }
 
 func GetColors(img *image.RGBA) []color.Color {
@@ -97,7 +124,12 @@ func ConvertImageToPaletted(img *image.RGBA, colors ...color.RGBA) *image.Palett
 			palette[i] = c
 		}
 	} else {
-		palette = GetColors(img)
+		imgColors := GetColors(img)
+		if len(imgColors) > 255 {
+			palette = FloatsToColors(kMeansFloats(255, ColorsToFloats(imgColors)...))
+		} else {
+			palette = imgColors
+		}
 	}
 	retImage := image.NewPaletted(img.Rect, palette)
 	for x := 0; x < img.Rect.Dx(); x++ {
@@ -185,4 +217,73 @@ func Gradient(pScalar float64, firstColor color.RGBA, colors ...color.RGBA) colo
 		return retColor
 	}
 	return allColors[minIndex]
+}
+
+func kMeansFloats(n int, points ...[]float64) [][]float64 {
+	if n <= 0 || len(points) == 0 {
+		return nil
+	}
+
+	centroids := make([][]float64, n)
+	for i := range centroids {
+		centroids[i] = points[i%len(points)]
+	}
+
+	distance := func(a, b []float64) float64 {
+		sum := 0.0
+		for i := range a {
+			diff := a[i] - b[i]
+			sum += diff * diff
+		}
+		return sum
+	}
+
+	assignments := make([]int, len(points))
+	for {
+		changed := false
+
+		for i, point := range points {
+			closest := 0
+			minDist := distance(point, centroids[0])
+			for j := 1; j < n; j++ {
+				dist := distance(point, centroids[j])
+				if dist < minDist {
+					closest = j
+					minDist = dist
+				}
+			}
+			if assignments[i] != closest {
+				assignments[i] = closest
+				changed = true
+			}
+		}
+
+		if !changed {
+			break
+		}
+
+		counts := make([]int, n)
+		newCentroids := make([][]float64, n)
+		for i := range newCentroids {
+			newCentroids[i] = make([]float64, len(points[0]))
+		}
+		for i, point := range points {
+			cluster := assignments[i]
+			for j := range point {
+				newCentroids[cluster][j] += point[j]
+			}
+			counts[cluster]++
+		}
+		for i := range newCentroids {
+			if counts[i] == 0 {
+				continue
+			}
+			for j := range newCentroids[i] {
+				newCentroids[i][j] /= float64(counts[i])
+			}
+		}
+		centroids = newCentroids
+	}
+
+	return centroids
 }
