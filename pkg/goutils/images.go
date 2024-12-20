@@ -107,3 +107,82 @@ func ConvertImageToPaletted(img *image.RGBA, colors ...color.RGBA) *image.Palett
 	}
 	return retImage
 }
+
+var COLOR_RED = color.RGBA{255, 0, 0, 255}
+var COLOR_YELLOW = color.RGBA{255, 255, 0, 255}
+var COLOR_BLUE = color.RGBA{0, 0, 255, 255}
+var COLOR_MAGENTA = color.RGBA{255, 0, 255, 255}
+var COLOR_CYAN = color.RGBA{0, 255, 255, 255}
+var COLOR_WHITE = color.RGBA{255, 255, 255, 255}
+var COLOR_BLACK = color.RGBA{0, 0, 0, 255}
+var COLOR_GRAY = color.RGBA{128, 128, 128, 255}
+var COLOR_LIGHT_GRAY = color.RGBA{192, 192, 192, 255}
+var COLOR_DARK_GRAY = color.RGBA{64, 64, 64, 255}
+var COLOR_GREEN = color.RGBA{0, 255, 0, 255}
+var COLOR_ORANGE = color.RGBA{255, 165, 0, 255}
+var COLOR_PINK = color.RGBA{255, 192, 203, 255}
+var COLOR_PURPLE = color.RGBA{128, 0, 128, 255}
+var COLOR_BROWN = color.RGBA{165, 42, 42, 255}
+var COLOR_LIGHT_GREEN = color.RGBA{144, 238, 144, 255}
+var COLOR_LIGHT_BLUE = color.RGBA{173, 216, 230, 255}
+var COLOR_LIGHT_YELLOW = color.RGBA{255, 255, 224, 255}
+var COLOR_LIGHT_ORANGE = color.RGBA{255, 204, 102, 255}
+
+func GradientGreenToRed(scalar float64) color.RGBA {
+	return Gradient(scalar, COLOR_GREEN, COLOR_YELLOW, COLOR_RED)
+}
+
+func Gradient(pScalar float64, firstColor color.RGBA, colors ...color.RGBA) color.RGBA {
+	if len(colors) == 0 {
+		return firstColor
+	}
+	scalar := pScalar
+	if scalar < 0 {
+		scalar = 0
+	}
+	if scalar > 1 {
+		scalar = 1
+	}
+	allColors := append([]color.RGBA{firstColor}, colors...)
+	var colorToScalar []Tuple
+	maxScalar := float64(0)
+	for i, c := range allColors {
+		colorToScalar = append(colorToScalar, Pair(HashColor(c), float64(i)/float64(len(allColors)-1)))
+		maxScalar = max(maxScalar, float64(i)/float64(len(allColors))-1)
+	}
+	minIndex := 0
+	maxIndex := len(colorToScalar) - 1
+	minRange := colorToScalar[minIndex]
+	maxRange := colorToScalar[maxIndex]
+	for i, tuple := range colorToScalar {
+		_, keyok := tuple[0].(int64)
+		value, valueok := tuple[1].(float64)
+		if keyok && valueok {
+			if scalar > value {
+				minIndex = i
+				minRange = colorToScalar[minIndex]
+			} else if scalar < value {
+				maxIndex = i
+				maxRange = colorToScalar[maxIndex]
+				break
+			} else {
+				return allColors[i]
+			}
+		}
+	}
+	minScalar, minOk := minRange[1].(float64)
+	maxScalar, maxOk := maxRange[1].(float64)
+	if minOk && maxOk {
+		t := (scalar - minScalar) / (maxScalar - minScalar)
+		minColor := allColors[minIndex]
+		maxColor := allColors[maxIndex]
+		retColor := color.RGBA{
+			R: uint8(float64(minColor.R)*(1.0-t) + float64(maxColor.R)*t),
+			G: uint8(float64(minColor.G)*(1.0-t) + float64(maxColor.G)*t),
+			B: uint8(float64(minColor.B)*(1.0-t) + float64(maxColor.B)*t),
+			A: uint8(float64(minColor.A)*(1.0-t) + float64(maxColor.A)*t),
+		}
+		return retColor
+	}
+	return allColors[minIndex]
+}

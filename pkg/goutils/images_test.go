@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"math"
 	"os"
 	"testing"
 )
@@ -92,6 +93,26 @@ func TestConnectTheDots(t *testing.T) {
 	DrawLine(img, x0, y0, x1, y1, lineColor, 10)
 
 	file, err := os.Create("TestConnectTheDots.png")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	png.Encode(file, img)
+}
+
+func TestGradientGreenToRed(t *testing.T) {
+	imgRect := image.Rect(0, 0, 500, 500)
+	img := image.NewRGBA(imgRect)
+	maxDistance := math.Sqrt(math.Pow(float64(imgRect.Dx()), 2.0) + math.Pow(float64(imgRect.Dy()), 2.0))
+	for x := 0; x < imgRect.Dx(); x++ {
+		for y := 0; y < imgRect.Dy(); y++ {
+			distance := math.Sqrt(math.Pow(float64(x), 2.0) + math.Pow(float64(y), 2.0))
+			s := distance / maxDistance
+			img.Set(x, y, GradientGreenToRed(s))
+		}
+	}
+	file, err := os.Create("TestGradientGreenToRed.png")
 	if err != nil {
 		panic(err)
 	}

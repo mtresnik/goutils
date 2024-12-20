@@ -140,3 +140,50 @@ func HashFloats(values ...float64) int64 {
 	finalHash := int64(hash1 ^ hash2)
 	return finalHash
 }
+
+func Filter[T any](arr []T, f func(T) bool) []T {
+	var result = make([]T, 0)
+	for _, v := range arr {
+		if f(v) {
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
+func MinBy[T any](arr []T, f func(T) float64) T {
+	minResult := arr[0]
+	for _, v := range arr {
+		if f(v) < f(minResult) {
+			minResult = v
+		}
+	}
+	return minResult
+}
+
+func MaxBy[T any](arr []T, f func(T) float64) T {
+	maxResult := arr[0]
+	for _, v := range arr {
+		if f(v) > f(maxResult) {
+			maxResult = v
+		}
+	}
+	return maxResult
+}
+
+func SumBy[T any](arr []T, f func(T) float64) float64 {
+	sum := 0.0
+	for _, v := range arr {
+		sum += f(v)
+	}
+	return sum
+}
+
+func IndexOf[T any](arr []T, f func(T) bool) int {
+	for i, v := range arr {
+		if f(v) {
+			return i
+		}
+	}
+	return -1
+}
