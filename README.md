@@ -1,6 +1,6 @@
 # goutils
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/mtresnik/goutils/blob/main/LICENSE)
-[![version](https://img.shields.io/badge/version-1.1.5-blue)](https://github.com/mtresnik/goutils/releases/tag/v1.1.5)
+[![version](https://img.shields.io/badge/version-1.1.6-blue)](https://github.com/mtresnik/goutils/releases/tag/v1.1.6)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg?style=flat-square)](https://makeapullrequest.com)
 <hr>
 
@@ -20,7 +20,7 @@ module mymodule
 
 go 1.23.3
 
-require github.com/mtresnik/goutils v1.1.5
+require github.com/mtresnik/goutils v1.1.6
 ```
 
 
