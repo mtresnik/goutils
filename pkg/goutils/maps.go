@@ -33,3 +33,13 @@ func CopyMapWithSlices[M ~map[K][]V, K comparable, V any](m M) M {
 	}
 	return cloned
 }
+
+func EntrySet[M ~map[K][]V, K comparable, V any](m M) []Tuple {
+	r := make([]Tuple, 0, len(m))
+	for k, v := range m {
+		for _, v2 := range v {
+			r = append(r, Tuple{k, v2})
+		}
+	}
+	return r
+}

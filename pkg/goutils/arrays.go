@@ -273,3 +273,26 @@ func Partition[T any](slice []T, predicate func(T) bool) ([]T, []T) {
 	}
 	return trueItems, falseItems
 }
+
+func Indices[T any](slice []T) chan int {
+	c := make(chan int)
+	go func() {
+		for i, _ := range slice {
+			c <- i
+		}
+		close(c)
+	}()
+	return c
+}
+
+func RangeOfIntsByStep(start int, end int, step int) []int {
+	var result = make([]int, 0)
+	for i := start; i < end; i += step {
+		result = append(result, i)
+	}
+	return result
+}
+
+func RangeOfInts(start int, end int) []int {
+	return RangeOfIntsByStep(start, end, 1)
+}
