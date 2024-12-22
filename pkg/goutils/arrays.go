@@ -141,6 +141,25 @@ func HashFloats(values ...float64) int64 {
 	return finalHash
 }
 
+func MapNotNil[T any, U any](arr []T, f func(T) *U) []*U {
+	var result = make([]*U, 0)
+	for _, v := range arr {
+		u := f(v)
+		if u != nil {
+			result = append(result, u)
+		}
+	}
+	return result
+}
+
+func Map[T any, U any](arr []T, f func(T) U) []U {
+	var result = make([]U, len(arr))
+	for i, v := range arr {
+		result[i] = f(v)
+	}
+	return result
+}
+
 func Filter[T any](arr []T, f func(T) bool) []T {
 	var result = make([]T, 0)
 	for _, v := range arr {
@@ -186,4 +205,18 @@ func IndexOf[T any](arr []T, f func(T) bool) int {
 		}
 	}
 	return -1
+}
+
+func Contains[T any](arr []T, f func(T) bool) bool {
+	return IndexOf(arr, f) != -1
+}
+
+func Unique[T comparable](arr []T) []T {
+	var result = make([]T, 0)
+	for _, v := range arr {
+		if !Contains(result, func(t T) bool { return t == v }) {
+			result = append(result, v)
+		}
+	}
+	return result
 }
