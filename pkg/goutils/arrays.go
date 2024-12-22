@@ -220,3 +220,56 @@ func Unique[T comparable](arr []T) []T {
 	}
 	return result
 }
+
+func All[T any](arr []T, f func(T) bool) bool {
+	for _, v := range arr {
+		if !f(v) {
+			return false
+		}
+	}
+	return true
+}
+
+func Any[T any](arr []T, f func(T) bool) bool {
+	for _, v := range arr {
+		if f(v) {
+			return true
+		}
+	}
+	return false
+}
+
+func Chunk[T any](slice []T, chunkSize int) [][]T {
+	if chunkSize <= 0 {
+		return nil
+	}
+	chunks := make([][]T, 0, (len(slice)+chunkSize-1)/chunkSize)
+	for i := 0; i < len(slice); i += chunkSize {
+		end := i + chunkSize
+		if end > len(slice) {
+			end = len(slice)
+		}
+		chunks = append(chunks, slice[i:end])
+	}
+	return chunks
+}
+
+func Reduce[T, U any](slice []T, initial U, f func(U, T) U) U {
+	result := initial
+	for _, v := range slice {
+		result = f(result, v)
+	}
+	return result
+}
+
+func Partition[T any](slice []T, predicate func(T) bool) ([]T, []T) {
+	var trueItems, falseItems []T
+	for _, item := range slice {
+		if predicate(item) {
+			trueItems = append(trueItems, item)
+		} else {
+			falseItems = append(falseItems, item)
+		}
+	}
+	return trueItems, falseItems
+}
