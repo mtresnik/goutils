@@ -74,3 +74,14 @@ func SliceToString(array []int64) string {
 	retString += "]"
 	return retString
 }
+
+func JoinToString(array []string, separator string) string {
+	retString := ""
+	for i, v := range array {
+		retString += v
+		if i < len(array)-1 {
+			retString += separator
+		}
+	}
+	return retString
+}

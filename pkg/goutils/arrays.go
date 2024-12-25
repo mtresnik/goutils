@@ -170,6 +170,32 @@ func Filter[T any](arr []T, f func(T) bool) []T {
 	return result
 }
 
+func MinOf(floats ...float64) float64 {
+	if len(floats) == 0 {
+		return 0.0
+	}
+	minValue := math.MaxFloat64
+	for _, v := range floats {
+		if v < minValue {
+			minValue = v
+		}
+	}
+	return minValue
+}
+
+func MaxOf(floats ...float64) float64 {
+	if len(floats) == 0 {
+		return 0.0
+	}
+	maxValue := floats[0]
+	for _, v := range floats {
+		if v > maxValue {
+			maxValue = v
+		}
+	}
+	return maxValue
+}
+
 func MinBy[T any](arr []T, f func(T) float64) T {
 	minResult := arr[0]
 	for _, v := range arr {
@@ -188,6 +214,14 @@ func MaxBy[T any](arr []T, f func(T) float64) T {
 		}
 	}
 	return maxResult
+}
+
+func SumOf(floats ...float64) float64 {
+	sum := 0.0
+	for _, v := range floats {
+		sum += v
+	}
+	return sum
 }
 
 func SumBy[T any](arr []T, f func(T) float64) float64 {
@@ -295,4 +329,49 @@ func RangeOfIntsByStep(start int, end int, step int) []int {
 
 func RangeOfInts(start int, end int) []int {
 	return RangeOfIntsByStep(start, end, 1)
+}
+
+func MapNoErrors[T any, U any](arr []T, mapping func(t T) (U, error)) []U {
+	var result = make([]U, 0)
+	for _, v := range arr {
+		u, err := mapping(v)
+		if err == nil {
+			result = append(result, u)
+		}
+	}
+	return result
+}
+
+func Zip[T any, U any, V any](arr1 []T, arr2 []U, zipping func(t T, u U) V) []V {
+	retSlice := make([]V, min(len(arr1), len(arr2)))
+	for i := 0; i < len(retSlice); i++ {
+		retSlice[i] = zipping(arr1[i], arr2[i])
+	}
+	return retSlice
+}
+
+func ZipWithNext[T any, U any](arr1 []T, zipping func(t T, u T) U) []U {
+	retSlice := make([]U, len(arr1)-1)
+	for i := 0; i < len(retSlice); i++ {
+		retSlice[i] = zipping(arr1[i], arr1[i+1])
+	}
+	return retSlice
+}
+
+func MapToInts(arr []any) []int {
+	return MapNoErrors(arr, ToInt)
+}
+
+func MapToFloats(arr []any) []float64 {
+	return MapNoErrors(arr, ToFloat64)
+}
+
+func LastIndex[T any](arr []T) int {
+	return len(arr) - 1
+}
+
+func Repeat(count int, f func()) {
+	for i := 0; i < count; i++ {
+		f()
+	}
 }

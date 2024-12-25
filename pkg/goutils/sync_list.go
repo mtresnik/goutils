@@ -15,10 +15,10 @@ func NewSyncList[T any]() *SyncList[T] {
 	}
 }
 
-func (s *SyncList[T]) Add(item T) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-	s.items = append(s.items, item)
+func (l *SyncList[T]) Add(item T) {
+	l.mutex.Lock()
+	defer l.mutex.Unlock()
+	l.items = append(l.items, item)
 }
 
 func (l *SyncList[T]) Remove(item T) bool {
